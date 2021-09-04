@@ -2,8 +2,8 @@
 
 namespace DieterCoopman\DatabaseComparer\Commands;
 
+use DieterCoopman\DatabaseComparer\DatabaseManager;
 use Illuminate\Console\Command;
-use Illuminate\Database\DatabaseManager;
 
 class DatabaseComparerCommand extends Command
 {
