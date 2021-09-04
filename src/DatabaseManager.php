@@ -44,6 +44,7 @@ class DatabaseManager
     private function getStatements(): Collection
     {
         $statements = collect($this->schemaDiff->toSaveSql(DB::connection(config('databasecomparer.connections.target'))->getDoctrineConnection()->getDatabasePlatform()));
+
         return $statements->merge($this->getDropStatements());
     }
 
@@ -54,8 +55,9 @@ class DatabaseManager
      */
     private function getDifference($targetSchema, $sourceSchema): DatabaseManager
     {
-        $comparator       = new \Doctrine\DBAL\Schema\Comparator();
+        $comparator = new \Doctrine\DBAL\Schema\Comparator();
         $this->schemaDiff = $comparator->compare($targetSchema, $sourceSchema);
+
         return $this;
     }
 
@@ -64,20 +66,20 @@ class DatabaseManager
         return (bool)$this->getStatements()->count();
     }
 
-
     private function getDropStatements(): Collection
     {
         $dropStatements = collect();
         $sourceTables = $this->getTables($this->getSchema(config('databasecomparer.connections.source')));
         $targetTables = $this->getTables($this->getSchema(config('databasecomparer.connections.target')));
-        $targetTables->diff($sourceTables)->each(function($table) use (&$dropStatements){
+        $targetTables->diff($sourceTables)->each(function ($table) use (&$dropStatements) {
             $dropStatements->push("DROP TABLE $table");
         });
+
         return $dropStatements;
     }
 
     private function getTables($sourceSchema): Collection
     {
-        return collect($sourceSchema->getTables())->transform(fn($table) => $table->getName())->values();
+        return collect($sourceSchema->getTables())->transform(fn ($table) => $table->getName())->values();
     }
 }
