@@ -5,10 +5,13 @@ namespace DieterCoopman\DatabaseComparer\Tests;
 use DieterCoopman\DatabaseComparer\DatabaseComparerServiceProvider;
 use DieterCoopman\DatabaseComparer\DatabaseManager;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
+    use RefreshDatabase;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -95,9 +98,9 @@ class TestCase extends Orchestra
         config()->set('databasecomparer.connections.source', 'testing');
         config()->set('databasecomparer.connections.target', 'sqlite');
         $databaseManager = app(DatabaseManager::class);
-        $sql     = $databaseManager->compare()->getSql();
+        $sql             = $databaseManager->compare()->getSql();
 
-        $this->assertStringContainsString('CREATE',$sql);
+        $this->assertStringContainsString('CREATE', $sql);
     }
 
     public function test_sql_does_not_contain_create_statement()
@@ -109,7 +112,7 @@ class TestCase extends Orchestra
 
         $sql = $databaseManager->compare()->getSql();
 
-        $this->assertStringNotContainsString('CREATE',$sql);
+        $this->assertStringNotContainsString('CREATE', $sql);
     }
 
     public function test_has_difference()
@@ -120,5 +123,14 @@ class TestCase extends Orchestra
 
         $this->assertTrue($databaseManager->compare()->hasDifference());
 
+    }
+
+    public function test_has_dropstatements()
+    {
+        config()->set('databasecomparer.connections.source', 'testing');
+        config()->set('databasecomparer.connections.target', 'sqlite');
+        $databaseManager = app(DatabaseManager::class);
+        $sql             = $databaseManager->compare()->getSql();
+        $this->assertStringContainsString('DROP TABLE', $sql);
     }
 }
