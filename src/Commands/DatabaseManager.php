@@ -16,6 +16,7 @@ class DatabaseManager
 
     public function compare(): self
     {
+        
         $sourceSchema = $this->getSchema(config('databasecomparer.connections.source'));
         $targetSchema = $this->getSchema(config('databasecomparer.connections.target'));
 
