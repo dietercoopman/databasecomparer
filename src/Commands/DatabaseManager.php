@@ -41,13 +41,6 @@ class DatabaseManager
         fclose($file);
     }
 
-    public function saveToMigrations(){
-        echo "not implemented yet";
-        $this->getStatements()->each(function($sql){
-            //Save to migration
-        });
-    }
-
     private function getStatements(): Collection
     {
         return collect($this->schemaDiff->toSaveSql(DB::connection(config('databasecomparer.connections.target'))->getDoctrineConnection()->getDatabasePlatform()));
