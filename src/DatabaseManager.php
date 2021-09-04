@@ -16,7 +16,6 @@ class DatabaseManager
 
     public function compare(): self
     {
-
         $sourceSchema = $this->getSchema(config('databasecomparer.connections.source'));
         $targetSchema = $this->getSchema(config('databasecomparer.connections.target'));
 
@@ -53,7 +52,7 @@ class DatabaseManager
      */
     private function getDifference($sourceSchema, $targetSchema): DatabaseManager
     {
-        $comparator       = new \Doctrine\DBAL\Schema\Comparator();
+        $comparator = new \Doctrine\DBAL\Schema\Comparator();
         $this->schemaDiff = $comparator->compare($sourceSchema, $targetSchema);
 
         return $this;
