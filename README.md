@@ -1,6 +1,6 @@
 # This tools compares the schema of two databases
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+This tool compares two database structures and gives you the possiblity to generate a sql file or synchronize the database structure from source to target.
 
 ## Installation
 
@@ -22,14 +22,21 @@ return [
     'connections' => [
         'source' => 'mysql',
         'target' => 'mysql'
-    ]
+    ],
+    'sqlfile'     => 'database/comparison.sql'
 ];
 
 ```
 
 ## Usage
 
+php artisan dbcomparer:compare
 
+the tool has two options , if no options provided you will be asked if you want to synchronize the structure 
+
+      --sql             show an sql statement as output
+      --save            save the sql statements to an sql file
+    
 ## Testing
 
 ```bash
