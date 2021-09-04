@@ -16,11 +16,12 @@ class DatabaseComparerCommand extends Command
     public function handle(DatabaseManager $databaseManager)
     {
         $comparison = $databaseManager->compare();
-        $options    = $this->options();
+        $options = $this->options();
 
         if ($databaseManager->hasDifference()) {
             if ($options['save']) {
                 $comparison->saveToFile();
+
                 return $this->info('The sql statements are written to the file '.config('databasecomparer.sqlfile'));
             }
 
@@ -35,10 +36,8 @@ class DatabaseComparerCommand extends Command
             if ($this->confirm('Are you sure you want to sync your target database ?')) {
                 return $comparison->exec();
             }
-        }else{
+        } else {
             $this->info('There is no difference in the two compared databases.');
         }
-
-
     }
 }
