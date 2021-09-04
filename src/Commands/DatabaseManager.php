@@ -63,5 +63,4 @@ class DatabaseManager
     {
         return $this->getStatements()->count();
     }
-
 }
