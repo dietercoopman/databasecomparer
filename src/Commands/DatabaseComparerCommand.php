@@ -3,6 +3,7 @@
 namespace DieterCoopman\DatabaseComparer\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Database\DatabaseManager;
 
 class DatabaseComparerCommand extends Command
 {
@@ -15,12 +16,12 @@ class DatabaseComparerCommand extends Command
     public function handle(DatabaseManager $databaseManager)
     {
         $comparison = $databaseManager->compare();
-        $options = $this->options();
+        $options    = $this->options();
 
         if ($databaseManager->hasDifference()) {
             if ($options['save']) {
                 $comparison->saveToFile();
-                $this->info('The sql statements are written to the file '.config('databasecomparer.sqlfile'));
+                $this->info('The sql statements are written to the file ' . config('databasecomparer.sqlfile'));
                 return;
             }
 

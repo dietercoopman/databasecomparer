@@ -1,6 +1,6 @@
 <?php
 
-namespace DieterCoopman\DatabaseComparer\Commands;
+namespace DieterCoopman\DatabaseComparer;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +16,7 @@ class DatabaseManager
 
     public function compare(): self
     {
-        
+
         $sourceSchema = $this->getSchema(config('databasecomparer.connections.source'));
         $targetSchema = $this->getSchema(config('databasecomparer.connections.target'));
 
@@ -31,7 +31,7 @@ class DatabaseManager
     public function exec(): void
     {
         $this->getStatements()->each(function ($sql) {
-            echo DB::connection(config('databasecomparer.connections.target'))->statement($sql);
+            DB::connection(config('databasecomparer.connections.target'))->statement($sql);
         });
     }
 
@@ -50,18 +50,17 @@ class DatabaseManager
     /**
      * @param $sourceSchema <string>
      * @param $targetSchema <string>
-     * @return self
      */
-    private function getDifference($sourceSchema, $targetSchema)
+    private function getDifference($sourceSchema, $targetSchema): DatabaseManager
     {
-        $comparator = new \Doctrine\DBAL\Schema\Comparator();
+        $comparator       = new \Doctrine\DBAL\Schema\Comparator();
         $this->schemaDiff = $comparator->compare($sourceSchema, $targetSchema);
 
         return $this;
     }
 
-    public function hasDifference()
+    public function hasDifference(): bool
     {
-        return $this->getStatements()->count();
+        return $this->getStatements()->count() ? true : false;
     }
 }

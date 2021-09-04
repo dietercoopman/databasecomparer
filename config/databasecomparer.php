@@ -5,5 +5,5 @@ return [
         'source' => 'mysql',
         'target' => 'mysql'
     ],
-    'sqlfile'     => 'database/dieter.sql'
+    'sqlfile'     => 'database/comparison.sql'
 ];
