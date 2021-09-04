@@ -16,17 +16,19 @@ class DatabaseComparerCommand extends Command
     public function handle(DatabaseManager $databaseManager)
     {
         $comparison = $databaseManager->compare();
-        $options    = $this->options();
+        $options = $this->options();
 
         if ($databaseManager->hasDifference()) {
             if ($options['save']) {
                 $comparison->saveToFile();
                 $this->info('The sql statements are written to the file ' . config('databasecomparer.sqlfile'));
+
                 return;
             }
 
             if ($options['sql']) {
                 $this->info($comparison->getSql());
+
                 return;
             }
 

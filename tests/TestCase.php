@@ -14,7 +14,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn(string $modelName) => 'DieterCoopman\\DatabaseComparer\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'DieterCoopman\\DatabaseComparer\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
@@ -40,17 +40,16 @@ class TestCase extends Orchestra
     public function test_schema_gets_fetched()
     {
         $databaseManager = app(DatabaseManager::class);
-        $schema          = $databaseManager->getSchema('testing');
+        $schema = $databaseManager->getSchema('testing');
         $this->assertInstanceOf(\Doctrine\DBAL\Schema\Schema::class, $schema);
     }
 
     public function test_databases_are_the_same()
     {
-
         config()->set('databasecomparer.connections.source', 'testing');
         config()->set('databasecomparer.connections.target', 'testing');
         $databaseManager = app(DatabaseManager::class);
-        $comparision     = $databaseManager->compare();
+        $comparision = $databaseManager->compare();
 
         $this->assertInstanceOf(DatabaseManager::class, $comparision);
         $this->assertEquals(';', $comparision->getSql());
@@ -61,9 +60,8 @@ class TestCase extends Orchestra
         config()->set('databasecomparer.connections.source', 'testing');
         config()->set('databasecomparer.connections.target', 'sqlite');
         $databaseManager = app(DatabaseManager::class);
-        $sql             = $databaseManager->compare()->getSql();
+        $sql = $databaseManager->compare()->getSql();
         $this->assertIsString($sql);
-
     }
 
     public function test_databases_are_different()
@@ -71,7 +69,7 @@ class TestCase extends Orchestra
         config()->set('databasecomparer.connections.source', 'testing');
         config()->set('databasecomparer.connections.target', 'sqlite');
         $databaseManager = app(DatabaseManager::class);
-        $comparision     = $databaseManager->compare();
+        $comparision = $databaseManager->compare();
 
         $this->assertInstanceOf(DatabaseManager::class, $comparision);
         $this->assertNotEquals(';', $comparision->getSql());
@@ -82,7 +80,7 @@ class TestCase extends Orchestra
         config()->set('databasecomparer.connections.source', 'testing');
         config()->set('databasecomparer.connections.target', 'sqlite');
         $databaseManager = app(DatabaseManager::class);
-        $comparision     = $databaseManager->compare();
+        $comparision = $databaseManager->compare();
 
         $comparision->saveToFile();
         $this->assertFileExists('database/comparison.sql');
@@ -95,9 +93,9 @@ class TestCase extends Orchestra
         config()->set('databasecomparer.connections.source', 'testing');
         config()->set('databasecomparer.connections.target', 'sqlite');
         $databaseManager = app(DatabaseManager::class);
-        $sql     = $databaseManager->compare()->getSql();
+        $sql = $databaseManager->compare()->getSql();
 
-        $this->assertStringContainsString('CREATE',$sql);
+        $this->assertStringContainsString('CREATE', $sql);
     }
 
     public function test_sql_does_not_contain_create_statement()
@@ -109,7 +107,7 @@ class TestCase extends Orchestra
 
         $sql = $databaseManager->compare()->getSql();
 
-        $this->assertStringNotContainsString('CREATE',$sql);
+        $this->assertStringNotContainsString('CREATE', $sql);
     }
 
     public function test_has_difference()
@@ -119,6 +117,5 @@ class TestCase extends Orchestra
         $databaseManager = app(DatabaseManager::class);
 
         $this->assertTrue($databaseManager->compare()->hasDifference());
-
     }
 }
