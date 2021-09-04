@@ -43,23 +43,41 @@ class DatabaseManager
 
     private function getStatements(): Collection
     {
-        return collect($this->schemaDiff->toSaveSql(DB::connection(config('databasecomparer.connections.target'))->getDoctrineConnection()->getDatabasePlatform()));
+        $statements = collect($this->schemaDiff->toSaveSql(DB::connection(config('databasecomparer.connections.target'))->getDoctrineConnection()->getDatabasePlatform()));
+        return $statements->merge($this->getDropStatements());
     }
 
     /**
      * @param $sourceSchema <string>
      * @param $targetSchema <string>
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    private function getDifference($sourceSchema, $targetSchema): DatabaseManager
+    private function getDifference($targetSchema, $sourceSchema): DatabaseManager
     {
-        $comparator = new \Doctrine\DBAL\Schema\Comparator();
-        $this->schemaDiff = $comparator->compare($sourceSchema, $targetSchema);
-
+        $comparator       = new \Doctrine\DBAL\Schema\Comparator();
+        $this->schemaDiff = $comparator->compare($targetSchema, $sourceSchema);
         return $this;
     }
 
     public function hasDifference(): bool
     {
-        return $this->getStatements()->count() ? true : false;
+        return (bool)$this->getStatements()->count();
+    }
+
+
+    private function getDropStatements(): Collection
+    {
+        $dropStatements = collect();
+        $sourceTables = $this->getTables($this->getSchema(config('databasecomparer.connections.source')));
+        $targetTables = $this->getTables($this->getSchema(config('databasecomparer.connections.target')));
+        $targetTables->diff($sourceTables)->each(function($table) use (&$dropStatements){
+            $dropStatements->push("DROP TABLE $table");
+        });
+        return $dropStatements;
+    }
+
+    private function getTables($sourceSchema): Collection
+    {
+        return collect($sourceSchema->getTables())->transform(fn($table) => $table->getName())->values();
     }
 }
