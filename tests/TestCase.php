@@ -120,7 +120,6 @@ class TestCase extends Orchestra
         $databaseManager = app(DatabaseManager::class);
 
         $this->assertTrue($databaseManager->compare()->hasDifference());
-
     }
 
     public function test_has_dropstatements()
@@ -128,7 +127,7 @@ class TestCase extends Orchestra
         config()->set('databasecomparer.connections.source', 'testing');
         config()->set('databasecomparer.connections.target', 'sqlite');
         $databaseManager = app(DatabaseManager::class);
-        $sql             = $databaseManager->compare()->getSql();
+        $sql = $databaseManager->compare()->getSql();
         $this->assertStringContainsString('DROP TABLE', $sql);
     }
 }
