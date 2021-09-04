@@ -1,5 +1,6 @@
 <?php namespace DieterCoopman\DatabaseComparer\Commands;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseManager
@@ -18,30 +19,26 @@ class DatabaseManager
         return $this->getDifference($targetSchema, $sourceSchema);
     }
 
-    public function toSql($output = true)
+    public function getSql(): string
     {
-        $statements =  $this->getStatements();
-        if($statements->count() > 0){
-            return $this->getStatements()->implode(';' . PHP_EOL).";";
-        }
-
+        return $this->getStatements()->implode(';' . PHP_EOL) . ";";
     }
 
-    public function exec()
+    public function exec(): void
     {
         $this->getStatements()->each(function ($sql) {
             echo DB::connection(config('databasecomparer.connections.target'))->statement($sql);
         });
     }
 
-    public function save()
+    public function saveToFile(): void
     {
-        $file = fopen("database/databasecomparer.sql", "w") or die("Unable to open file!");
-        fwrite($file, $this->toSql());
+        $file = fopen(config('databasecomparer.sqlfile'), "w") or die("Unable to open file!");
+        fwrite($file, $this->getSql());
         fclose($file);
     }
 
-    private function getStatements()
+    private function getStatements(): Collection
     {
         return collect($this->schemaDiff->toSaveSql(DB::connection(config('databasecomparer.connections.target'))->getDoctrineConnection()->getDatabasePlatform()));
     }
@@ -56,6 +53,11 @@ class DatabaseManager
         $comparator       = new \Doctrine\DBAL\Schema\Comparator();
         $this->schemaDiff = $comparator->compare($sourceSchema, $targetSchema);
         return $this;
+    }
+
+    public function hasDifference()
+    {
+        return $this->getStatements()->count();
     }
 
 }
