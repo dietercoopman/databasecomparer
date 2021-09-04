@@ -2,9 +2,9 @@
 
 namespace DieterCoopman\DatabaseComparer\Tests;
 
+use DieterCoopman\DatabaseComparer\DatabaseComparerServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use DieterCoopman\DatabaseComparer\DatabaseComparerServiceProvider;
 
 class TestCase extends Orchestra
 {
