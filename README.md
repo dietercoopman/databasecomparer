@@ -1,3 +1,6 @@
+![Tests](https://github.com/dietercoopman/databasecomparer/workflows/tests/badge.svg)
+
+
 # This tools compares the schema of two databases
 
 This tool compares two database structures and gives you the possiblity to generate a sql file or synchronize the database structure from source to target.
