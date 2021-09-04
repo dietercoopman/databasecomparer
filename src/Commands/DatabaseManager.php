@@ -1,4 +1,6 @@
-<?php namespace DieterCoopman\DatabaseComparer\Commands;
+<?php
+
+namespace DieterCoopman\DatabaseComparer\Commands;
 
 use Illuminate\Support\Facades\DB;
 
@@ -15,16 +17,16 @@ class DatabaseManager
     {
         $sourceSchema = $this->getSchema(config('databasecomparer.connections.source'));
         $targetSchema = $this->getSchema(config('databasecomparer.connections.target'));
+
         return $this->getDifference($targetSchema, $sourceSchema);
     }
 
     public function toSql($output = true)
     {
-        $statements =  $this->getStatements();
-        if($statements->count() > 0){
+        $statements = $this->getStatements();
+        if ($statements->count() > 0) {
             return $this->getStatements()->implode(';' . PHP_EOL).";";
         }
-
     }
 
     public function exec()
@@ -53,9 +55,9 @@ class DatabaseManager
      */
     private function getDifference($sourceSchema, $targetSchema)
     {
-        $comparator       = new \Doctrine\DBAL\Schema\Comparator();
+        $comparator = new \Doctrine\DBAL\Schema\Comparator();
         $this->schemaDiff = $comparator->compare($sourceSchema, $targetSchema);
+
         return $this;
     }
-
 }

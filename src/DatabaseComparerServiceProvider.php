@@ -2,9 +2,9 @@
 
 namespace DieterCoopman\DatabaseComparer;
 
+use DieterCoopman\DatabaseComparer\Commands\DatabaseComparerCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use DieterCoopman\DatabaseComparer\Commands\DatabaseComparerCommand;
 
 class DatabaseComparerServiceProvider extends PackageServiceProvider
 {

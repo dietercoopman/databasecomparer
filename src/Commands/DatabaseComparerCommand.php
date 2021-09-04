@@ -2,7 +2,6 @@
 
 namespace DieterCoopman\DatabaseComparer\Commands;
 
-use Doctrine\DBAL\Schema\Table;
 use Illuminate\Console\Command;
 
 class DatabaseComparerCommand extends Command
