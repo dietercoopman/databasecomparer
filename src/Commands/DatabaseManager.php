@@ -41,9 +41,10 @@ class DatabaseManager
         fclose($file);
     }
 
-    public function saveToMigrations(){
+    public function saveToMigrations()
+    {
         echo "not implemented yet";
-        $this->getStatements()->each(function($sql){
+        $this->getStatements()->each(function ($sql) {
             //Save to migration
         });
     }
