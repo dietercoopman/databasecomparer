@@ -1,10 +1,10 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace DieterCoopman\DatabaseComparer\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class DatabaseComparerCommand extends Command
 {
     public $signature = 'skeleton';
 

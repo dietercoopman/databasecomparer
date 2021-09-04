@@ -1,13 +1,13 @@
 <?php
 
-namespace VendorName\Skeleton;
+namespace DieterCoopman\DatabaseComparer;
 
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \VendorName\Skeleton\Skeleton
+ * @see \DieterCoopman\DatabaseComparer\DatabaseComparer
  */
-class SkeletonFacade extends Facade
+class DatabaseComparerFacade extends Facade
 {
     protected static function getFacadeAccessor()
     {

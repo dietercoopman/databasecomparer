@@ -1,6 +1,6 @@
 <?php
 
-namespace VendorName\Skeleton\Tests;
+namespace DieterCoopman\DatabaseComparer\Tests;
 
 class ExampleTest extends TestCase
 {

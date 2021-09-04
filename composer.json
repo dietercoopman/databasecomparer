@@ -1,8 +1,8 @@
 {
     "name": "vendor_slug/package_slug",
-    "description": ":package_description",
+    "description": "This tools compares the schema of two databases",
     "keywords": [
-        ":vendor_name",
+        "dietercoopman",
         "laravel",
         "package_slug"
     ],
@@ -10,8 +10,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Dieter Coopman",
+            "email": "dieter@deltasolutions.be",
             "role": "Developer"
         }
     ],
@@ -30,13 +30,13 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories"
+            "DieterCoopman\\DatabaseComparer\\": "src",
+            "DieterCoopman\\DatabaseComparer\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests"
+            "DieterCoopman\\DatabaseComparer\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -50,10 +50,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "DieterCoopman\\DatabaseComparer\\DatabaseComparerServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\SkeletonFacade"
+                "DatabaseComparer": "DieterCoopman\\DatabaseComparer\\DatabaseComparerFacade"
             }
         }
     },
