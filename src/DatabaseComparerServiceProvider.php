@@ -16,10 +16,8 @@ class DatabaseComparerServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package
-            ->name('skeleton')
-            ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_skeleton_table')
+            ->name('databasecomparer')
+            ->hasConfigFile('databasecomparer')
             ->hasCommand(DatabaseComparerCommand::class);
     }
 }
