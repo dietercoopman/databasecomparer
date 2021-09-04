@@ -10,13 +10,13 @@ return new class extends Migration
     {
         Schema::connection('sqlite')->create('databasecomparer_table_other', function (Blueprint $table) {
             $table->id();
-            $table->string('field');
+            $table->string('field')->nullable();
             $table->timestamps();
         });
 
          Schema::connection('sqlite')->create('databasecomparer_table', function (Blueprint $table) {
             $table->id();
-            $table->string('field');
+            $table->string('field')->nullable();
             $table->timestamps();
          });
     }
