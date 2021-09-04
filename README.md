@@ -1,4 +1,5 @@
 ![Tests](https://github.com/dietercoopman/databasecomparer/workflows/run-tests/badge.svg)
+![Downloads](https://img.shields.io/packagist/dt/dietercoopman/databasecomparer.svg?style=flat-square)
 
 
 # This tools compares the schema of two databases
