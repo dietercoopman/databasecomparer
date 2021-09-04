@@ -11,6 +11,8 @@ class DatabaseManager
 
     public function getSchema(string $connection)
     {
+        //this is a fix for unknown enum type
+        DB::connection($connection)->getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
         return DB::connection($connection)->getDoctrineConnection()->getSchemaManager()->createSchema();
     }
 
