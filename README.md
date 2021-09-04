@@ -1,4 +1,4 @@
-![Tests](https://github.com/dietercoopman/databasecomparer/workflows/run-test/badge.svg)
+![Tests](https://github.com/dietercoopman/databasecomparer/workflows/run-tests/badge.svg)
 
 
 # This tools compares the schema of two databases
