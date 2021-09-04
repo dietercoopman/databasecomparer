@@ -30,7 +30,9 @@ return [
 
 ## Usage
 
+```bash
 php artisan dbcomparer:compare
+```
 
 the tool has two options , if no options provided you will be asked if you want to synchronize the structure 
 
