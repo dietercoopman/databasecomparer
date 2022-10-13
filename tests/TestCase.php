@@ -31,21 +31,14 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app)
     {
-
-        if(file_exists('./database/a.sqlite')){
-            unlink('./database/a.sqlite');
-        }
-        touch('./database/a.sqlite');
-        config()->set('database.default', 'testing');
-        config()->set('database.connections.testing.database', 'database/a.sqlite');
+        config()->set('database.default', 'source');
+        config()->set('database.connections.source', config()->get('database.connections.testing'));
         $migration = include __DIR__ . '/../database/migrations/create_databasecomparer_table.php.stub';
         $migration->up();
 
-        if(file_exists('./database/b.sqlite')){
-            unlink('./database/b.sqlite');
-        }
-        touch('./database/b.sqlite');
-        config()->set('database.connections.sqlite.database', 'database/b.sqlite');
+        config()->set('database.connections.target', config()->get('database.connections.sqlite'));
+        config()->set('database.connections.target.database', ':memory:');
+
         $migration = include __DIR__ . '/../database/migrations/create_databasecomparer_other_table.php.stub';
         $migration->up();
 
@@ -54,16 +47,19 @@ class TestCase extends Orchestra
     public function test_schema_gets_fetched()
     {
         $databaseManager = app(DatabaseManager::class);
-        $databaseManager->setSourceConnectionData(config()->get('database.connections.testing'));
+        $databaseManager->useLaravalConnection();
         $schema = $databaseManager->getSchema('source');
+
         $this->assertInstanceOf(\Doctrine\DBAL\Schema\Schema::class, $schema);
+
     }
 
     public function test_databases_are_the_same()
     {
+        config()->set('database.connections.source', config()->get('database.connections.target'));
+
         $databaseManager = app(DatabaseManager::class);
-        $databaseManager->setSourceConnectionData(config()->get('database.connections.testing'));
-        $databaseManager->setTargetConnectionData(config()->get('database.connections.testing'));
+        $databaseManager->useLaravalConnection();
         $comparision = $databaseManager->compare();
 
         $this->assertInstanceOf(DatabaseManager::class, $comparision);
@@ -73,8 +69,7 @@ class TestCase extends Orchestra
     public function test_sql_can_be_get()
     {
         $databaseManager = app(DatabaseManager::class);
-        $databaseManager->setSourceConnectionData(config()->get('database.connections.testing'));
-        $databaseManager->setTargetConnectionData(config()->get('database.connections.sqlite'));
+        $databaseManager->useLaravalConnection();
 
         $sql = $databaseManager->compare()->getSql();
         $this->assertIsString($sql);
@@ -83,8 +78,8 @@ class TestCase extends Orchestra
     public function test_databases_are_different()
     {
         $databaseManager = app(DatabaseManager::class);
-        $databaseManager->setSourceConnectionData(config()->get('database.connections.testing'));
-        $databaseManager->setTargetConnectionData(config()->get('database.connections.sqlite'));
+        $databaseManager->useLaravalConnection();
+
         $comparision = $databaseManager->compare();
 
         $this->assertInstanceOf(DatabaseManager::class, $comparision);
@@ -94,8 +89,8 @@ class TestCase extends Orchestra
     public function test_sqlfile_is_written()
     {
         $databaseManager = app(DatabaseManager::class);
-        $databaseManager->setSourceConnectionData(config()->get('database.connections.testing'));
-        $databaseManager->setTargetConnectionData(config()->get('database.connections.sqlite'));
+        $databaseManager->useLaravalConnection();
+
         $comparision = $databaseManager->compare();
 
         $comparision->saveToFile();
@@ -107,8 +102,8 @@ class TestCase extends Orchestra
     public function test_sql_contains_create_statement()
     {
         $databaseManager = app(DatabaseManager::class);
-        $databaseManager->setSourceConnectionData(config()->get('database.connections.testing'));
-        $databaseManager->setTargetConnectionData(config()->get('database.connections.sqlite'));
+        $databaseManager->useLaravalConnection();
+
         $sql = $databaseManager->compare()->getSql();
 
         $this->assertStringContainsString('CREATE', $sql);
@@ -117,8 +112,8 @@ class TestCase extends Orchestra
     public function test_sql_does_not_contain_create_statement()
     {
         $databaseManager = app(DatabaseManager::class);
-        $databaseManager->setSourceConnectionData(config()->get('database.connections.testing'));
-        $databaseManager->setTargetConnectionData(config()->get('database.connections.sqlite'));
+        $databaseManager->useLaravalConnection();
+
         $databaseManager->compare()->exec();
 
         $sql = $databaseManager->compare()->getSql();
@@ -129,8 +124,7 @@ class TestCase extends Orchestra
     public function test_has_difference()
     {
         $databaseManager = app(DatabaseManager::class);
-        $databaseManager->setSourceConnectionData(config()->get('database.connections.testing'));
-        $databaseManager->setTargetConnectionData(config()->get('database.connections.sqlite'));
+        $databaseManager->useLaravalConnection();
 
         $this->assertTrue($databaseManager->compare()->hasDifference());
     }
@@ -138,8 +132,7 @@ class TestCase extends Orchestra
     public function test_has_dropstatements()
     {
         $databaseManager = app(DatabaseManager::class);
-        $databaseManager->setSourceConnectionData(config()->get('database.connections.testing'));
-        $databaseManager->setTargetConnectionData(config()->get('database.connections.sqlite'));
+        $databaseManager->useLaravalConnection();
 
         $sql = $databaseManager->compare()->getSql();
         $this->assertStringContainsString('DROP TABLE', $sql);

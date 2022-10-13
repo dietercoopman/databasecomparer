@@ -4,26 +4,39 @@ namespace DieterCoopman\DatabaseComparer;
 
 use Doctrine\DBAL\DriverManager;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseManager
 {
-    private $schemaDiff;
-    private $sourceConnectionData;
-    private $targetConnectionData;
+    private       $schemaDiff;
+    private array $sourceConnectionData;
+    private array $targetConnectionData;
+    private bool  $usesLaravelConnection = false;
 
-    public function getSchema($connection)
+    public function useLaravalConnection(): void
     {
-        return $this->getSchemaManager($this->getSettings($connection))->createSchema();
+        $this->usesLaravelConnection = true;
     }
 
-    private function getSchemaManager($connectionSettings)
+    public function getSchema($connectionOrSettings)
     {
-        return $this->getConnection($connectionSettings)->getSchemaManager();
+        if ($this->usesLaravelConnection) {
+            return DB::connection($connectionOrSettings)->getDoctrineConnection()->createSchemaManager()->createSchema();
+        }
+        return $this->getSchemaManager($connectionOrSettings)->createSchema();
     }
 
-    private function getConnection($connectionSettings)
+    private function getSchemaManager($connectionOrSettings)
     {
-        $connection       = DriverManager::getConnection($connectionSettings);
+        return $this->getConnection($connectionOrSettings)->createSchemaManager();
+    }
+
+    private function getConnection($connectionOrSettings)
+    {
+        if($this->usesLaravelConnection){
+            return DB::connection($connectionOrSettings)->getDoctrineConnection();
+        }
+        $connection       = DriverManager::getConnection($this->getSettings($connectionOrSettings));
         $databasePlatform = $connection->getDatabasePlatform();
         $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
         return $connection;
@@ -46,7 +59,7 @@ class DatabaseManager
     public function exec(): void
     {
         $this->getStatements()->each(function ($sql) {
-            $this->getConnection($this->getSettings('target'))->prepare($sql)->executeStatement();
+            $this->getConnection('target')->prepare($sql)->executeStatement();
         });
     }
 
@@ -59,7 +72,7 @@ class DatabaseManager
 
     private function getStatements(): Collection
     {
-        $statements = collect($this->schemaDiff->toSaveSql($this->getConnection($this->getSettings('target'))->getDatabasePlatform()));
+        $statements = collect($this->schemaDiff->toSaveSql($this->getConnection('target')->getDatabasePlatform()));
 
         return $statements->merge($this->getDropStatements());
     }
@@ -106,12 +119,12 @@ class DatabaseManager
         return $settings;
     }
 
-    public function setSourceConnectionData($sourceConnectionData) : void
+    public function setSourceConnectionData($sourceConnectionData): void
     {
         $this->sourceConnectionData = $sourceConnectionData;
     }
 
-    public function setTargetConnectionData($targetConnectionData) : void
+    public function setTargetConnectionData($targetConnectionData): void
     {
         $this->targetConnectionData = $targetConnectionData;
     }
