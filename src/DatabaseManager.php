@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class DatabaseManager
 {
-    private       $schemaDiff;
+    private $schemaDiff;
     private array $sourceConnectionData;
     private array $targetConnectionData;
     private bool  $usesLaravelConnection = false;
@@ -23,6 +23,7 @@ class DatabaseManager
         if ($this->usesLaravelConnection) {
             return DB::connection($connectionOrSettings)->getDoctrineConnection()->createSchemaManager()->createSchema();
         }
+
         return $this->getSchemaManager($connectionOrSettings)->createSchema();
     }
 
@@ -33,15 +34,15 @@ class DatabaseManager
 
     private function getConnection($connectionOrSettings)
     {
-        if($this->usesLaravelConnection){
+        if ($this->usesLaravelConnection) {
             return DB::connection($connectionOrSettings)->getDoctrineConnection();
         }
-        $connection       = DriverManager::getConnection($this->getSettings($connectionOrSettings));
+        $connection = DriverManager::getConnection($this->getSettings($connectionOrSettings));
         $databasePlatform = $connection->getDatabasePlatform();
         $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
+
         return $connection;
     }
-
 
     public function compare(): self
     {
@@ -84,7 +85,7 @@ class DatabaseManager
      */
     private function getDifference($targetSchema, $sourceSchema): DatabaseManager
     {
-        $comparator       = new \Doctrine\DBAL\Schema\Comparator();
+        $comparator = new \Doctrine\DBAL\Schema\Comparator();
         $this->schemaDiff = $comparator->compare($targetSchema, $sourceSchema);
 
         return $this;
@@ -98,8 +99,8 @@ class DatabaseManager
     private function getDropStatements(): Collection
     {
         $dropStatements = collect();
-        $sourceTables   = $this->getTables($this->getSchema('source'));
-        $targetTables   = $this->getTables($this->getSchema('target'));
+        $sourceTables = $this->getTables($this->getSchema('source'));
+        $targetTables = $this->getTables($this->getSchema('target'));
         $targetTables->diff($sourceTables)->each(function ($table) use (&$dropStatements) {
             $dropStatements->push("DROP TABLE $table");
         });
@@ -109,13 +110,14 @@ class DatabaseManager
 
     private function getTables($sourceSchema): Collection
     {
-        return collect($sourceSchema->getTables())->transform(fn($table) => $table->getName())->values();
+        return collect($sourceSchema->getTables())->transform(fn ($table) => $table->getName())->values();
     }
 
     private function getSettings(string $connection)
     {
-        $settings           = $this->{$connection . 'ConnectionData'};
+        $settings = $this->{$connection . 'ConnectionData'};
         $settings['driver'] = "pdo_" . $settings['driver'];
+
         return $settings;
     }
 
@@ -128,6 +130,4 @@ class DatabaseManager
     {
         $this->targetConnectionData = $targetConnectionData;
     }
-
-
 }

@@ -17,7 +17,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn(string $modelName) => 'DieterCoopman\\DatabaseComparer\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'DieterCoopman\\DatabaseComparer\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
@@ -27,7 +27,6 @@ class TestCase extends Orchestra
             DatabaseComparerServiceProvider::class,
         ];
     }
-
 
     public function getEnvironmentSetUp($app)
     {
@@ -41,7 +40,6 @@ class TestCase extends Orchestra
 
         $migration = include __DIR__ . '/../database/migrations/create_databasecomparer_other_table.php.stub';
         $migration->up();
-
     }
 
     public function test_schema_gets_fetched()
@@ -51,7 +49,6 @@ class TestCase extends Orchestra
         $schema = $databaseManager->getSchema('source');
 
         $this->assertInstanceOf(\Doctrine\DBAL\Schema\Schema::class, $schema);
-
     }
 
     public function test_databases_are_the_same()
