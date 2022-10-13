@@ -2,24 +2,38 @@
 
 namespace DieterCoopman\DatabaseComparer;
 
+use Doctrine\DBAL\DriverManager;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class DatabaseManager
 {
     private $schemaDiff;
+    private $sourceConnectionData;
+    private $targetConnectionData;
 
-    public function getSchema(string $connection)
+    public function getSchema($connection)
     {
-        //this is a fix for unknown enum type
-        DB::connection($connection)->getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
-        return DB::connection($connection)->getDoctrineConnection()->getSchemaManager()->createSchema();
+        return $this->getSchemaManager($this->getSettings($connection))->createSchema();
     }
+
+    private function getSchemaManager($connectionSettings)
+    {
+        return $this->getConnection($connectionSettings)->getSchemaManager();
+    }
+
+    private function getConnection($connectionSettings)
+    {
+        $connection       = DriverManager::getConnection($connectionSettings);
+        $databasePlatform = $connection->getDatabasePlatform();
+        $databasePlatform->registerDoctrineTypeMapping('enum', 'string');
+        return $connection;
+    }
+
 
     public function compare(): self
     {
-        $sourceSchema = $this->getSchema(config('databasecomparer.connections.source'));
-        $targetSchema = $this->getSchema(config('databasecomparer.connections.target'));
+        $sourceSchema = $this->getSchema('source');
+        $targetSchema = $this->getSchema('target');
 
         return $this->getDifference($targetSchema, $sourceSchema);
     }
@@ -32,7 +46,7 @@ class DatabaseManager
     public function exec(): void
     {
         $this->getStatements()->each(function ($sql) {
-            DB::connection(config('databasecomparer.connections.target'))->statement($sql);
+            $this->getConnection($this->getSettings('target'))->prepare($sql)->executeStatement();
         });
     }
 
@@ -45,7 +59,7 @@ class DatabaseManager
 
     private function getStatements(): Collection
     {
-        $statements = collect($this->schemaDiff->toSaveSql(DB::connection(config('databasecomparer.connections.target'))->getDoctrineConnection()->getDatabasePlatform()));
+        $statements = collect($this->schemaDiff->toSaveSql($this->getConnection($this->getSettings('target'))->getDatabasePlatform()));
 
         return $statements->merge($this->getDropStatements());
     }
@@ -57,7 +71,7 @@ class DatabaseManager
      */
     private function getDifference($targetSchema, $sourceSchema): DatabaseManager
     {
-        $comparator = new \Doctrine\DBAL\Schema\Comparator();
+        $comparator       = new \Doctrine\DBAL\Schema\Comparator();
         $this->schemaDiff = $comparator->compare($targetSchema, $sourceSchema);
 
         return $this;
@@ -71,8 +85,8 @@ class DatabaseManager
     private function getDropStatements(): Collection
     {
         $dropStatements = collect();
-        $sourceTables = $this->getTables($this->getSchema(config('databasecomparer.connections.source')));
-        $targetTables = $this->getTables($this->getSchema(config('databasecomparer.connections.target')));
+        $sourceTables   = $this->getTables($this->getSchema('source'));
+        $targetTables   = $this->getTables($this->getSchema('target'));
         $targetTables->diff($sourceTables)->each(function ($table) use (&$dropStatements) {
             $dropStatements->push("DROP TABLE $table");
         });
@@ -82,6 +96,25 @@ class DatabaseManager
 
     private function getTables($sourceSchema): Collection
     {
-        return collect($sourceSchema->getTables())->transform(fn ($table) => $table->getName())->values();
+        return collect($sourceSchema->getTables())->transform(fn($table) => $table->getName())->values();
     }
+
+    private function getSettings(string $connection)
+    {
+        $settings           = $this->{$connection . 'ConnectionData'};
+        $settings['driver'] = "pdo_" . $settings['driver'];
+        return $settings;
+    }
+
+    public function setSourceConnectionData($sourceConnectionData) : void
+    {
+        $this->sourceConnectionData = $sourceConnectionData;
+    }
+
+    public function setTargetConnectionData($targetConnectionData) : void
+    {
+        $this->targetConnectionData = $targetConnectionData;
+    }
+
+
 }

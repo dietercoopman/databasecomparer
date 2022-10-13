@@ -15,6 +15,12 @@ class DatabaseComparerCommand extends Command
 
     public function handle(DatabaseManager $databaseManager)
     {
+        $sourceConnectionData = config('databasecomparer.connections.source');
+        $targetConnectionData = config('databasecomparer.connections.target');
+
+        $databaseManager->setSourceConnectionData($sourceConnectionData);
+        $databaseManager->setTargetConnectionData($targetConnectionData);
+
         $comparison = $databaseManager->compare();
         $options = $this->options();
 
