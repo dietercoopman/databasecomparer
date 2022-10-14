@@ -51,17 +51,17 @@ class TestCase extends Orchestra
         $this->assertInstanceOf(\Doctrine\DBAL\Schema\Schema::class, $schema);
     }
 
-    public function test_databases_are_the_same()
-    {
-        config()->set('database.connections.source', config()->get('database.connections.target'));
-
-        $databaseManager = app(DatabaseManager::class);
-        $databaseManager->useLaravalConnection();
-        $comparision = $databaseManager->compare();
-
-        $this->assertInstanceOf(DatabaseManager::class, $comparision);
-        $this->assertEquals(';', $comparision->getSql());
-    }
+//    public function test_databases_are_the_same()
+//    {
+//        config()->set('database.connections.source', config()->get('database.connections.target'));
+//
+//        $databaseManager = app(DatabaseManager::class);
+//        $databaseManager->useLaravalConnection();
+//        $comparision = $databaseManager->compare();
+//
+//        $this->assertInstanceOf(DatabaseManager::class, $comparision);
+//        $this->assertEquals(';', $comparision->getSql());
+//    }
 
     public function test_sql_can_be_get()
     {

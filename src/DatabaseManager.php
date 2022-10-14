@@ -27,7 +27,7 @@ class DatabaseManager
         return $this->getSchemaManager($connectionOrSettings)->createSchema();
     }
 
-    private function getSchemaManager($connectionOrSettings)
+    public function getSchemaManager($connectionOrSettings)
     {
         return $this->getConnection($connectionOrSettings)->createSchemaManager();
     }
